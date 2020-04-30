@@ -3,6 +3,8 @@ import { OBJLoader } from "./js/OBJLoader.js";
 import { OrbitControls } from "./js/OrbitControls.js";
 
 
+import "./js/hammer.min.js"
+
 
 
 export function initAirplane(evtHandlers, enableOrbitControls) {
@@ -15,8 +17,7 @@ export function initAirplane(evtHandlers, enableOrbitControls) {
 
     var texture = textureLoader.load("textures/metal.jpg");
     const material = new THREE.MeshPhongMaterial({
-        color: "lightgray", // red (can also use a CSS color string here)
-        flatShading: true,
+        color: "lightgray",
         opacity: 1,
     });
 
@@ -81,6 +82,7 @@ export function initAirplane(evtHandlers, enableOrbitControls) {
 
     camera.up.set(0, 1, 0);
     handleCameraKeyControls(initCameraPosition, camera, evtHandlers);
+    handleCameraSwipeControls(airplane, initCameraPosition, camera, evtHandlers);
 
 
     if (enableOrbitControls) {
@@ -118,44 +120,95 @@ export function initAirplane(evtHandlers, enableOrbitControls) {
 
 
 function handleCameraKeyControls(initCameraPosition, camera, evtHandlers) {
-    let { onPlaneTurn, onSpeedChange, onPlanePause } = evtHandlers;
+
 
     document.onkeydown = function (e) {
         switch (e.keyCode) {
             case 32:
-                onPlanePause();
+                //space
+                handleFlightMovement("pause", initCameraPosition, camera, evtHandlers)
                 break;
             case 37:
-                // left
-                if (camera.position.x <= initCameraPosition.x + 15 + 1) {
-                    camera.position.x += 8;
-                    onPlaneTurn(isLevelFlight(camera, initCameraPosition), calculateDegreesToTurn(camera, initCameraPosition));
-                }
+                //left
+                handleFlightMovement("left", initCameraPosition, camera, evtHandlers)
                 break;
             case 38:
                 // up moves closer to ground
-                if (camera.position.y >= initCameraPosition.y - 10 - 1) {
-                    camera.position.y -= 1;
-                    onSpeedChange("up")
-                }
+                handleFlightMovement("up", initCameraPosition, camera, evtHandlers)
                 break;
             case 39:
                 // right
-                if (camera.position.x >= initCameraPosition.x - 15 - 1) {
-                    camera.position.x -= 8;
-                    onPlaneTurn(isLevelFlight(camera, initCameraPosition), calculateDegreesToTurn(camera, initCameraPosition));
-                }
+                handleFlightMovement("right", initCameraPosition, camera, evtHandlers)
                 break;
             case 40:
-                // down moves closer to user
-                if (camera.position.y <= initCameraPosition.y + 15 + 1) {
-                    camera.position.y += 1;
-                    onSpeedChange("down")
-                }
+                //down
+                handleFlightMovement("down", initCameraPosition, camera, evtHandlers)
                 break;
         }
     };
 }
+
+
+function handleCameraSwipeControls(element, initCameraPosition, camera, evtHandlers) {
+    let hammertime = new Hammer(element);
+    hammertime.on('pan', function (ev) {
+        switch (ev.additionalEvent) {
+            case 'panleft':
+                handleFlightMovement("left", initCameraPosition, camera, evtHandlers)
+                break;
+            case 'panright':
+                handleFlightMovement("right", initCameraPosition, camera, evtHandlers)
+                break;
+            case 'panup':
+                handleFlightMovement("up", initCameraPosition, camera, evtHandlers)
+                break;
+            case 'pandown':
+                handleFlightMovement("down", initCameraPosition, camera, evtHandlers)
+                break;
+        }
+    });
+
+    hammertime.on('press', function (ev) {
+        handleFlightMovement("pause", initCameraPosition, camera, evtHandlers)
+    });
+}
+
+
+function handleFlightMovement(direction, initCameraPosition, camera, evtHandlers) {
+    let { onPlaneTurn, onSpeedChange, onPlanePause } = evtHandlers;
+    switch (direction) {
+        case 'left':
+            // left
+            if (camera.position.x <= initCameraPosition.x + 16) {
+                camera.position.x += 8;
+                onPlaneTurn(isLevelFlight(camera, initCameraPosition), calculateDegreesToTurn(camera, initCameraPosition));
+            }
+            break;
+        case 'right':
+            if (camera.position.x >= initCameraPosition.x - 16) {
+                camera.position.x -= 8;
+                onPlaneTurn(isLevelFlight(camera, initCameraPosition), calculateDegreesToTurn(camera, initCameraPosition));
+            }
+            break;
+        case 'up':
+            if (camera.position.y >= initCameraPosition.y - 10 - 1) {
+                camera.position.y -= 1;
+                onSpeedChange("up")
+            }
+            break;
+        case 'down':
+            // down moves closer to user
+            if (camera.position.y <= initCameraPosition.y + 10 + 1) {
+                camera.position.y += 1;
+                onSpeedChange("down")
+            }
+        case 'pause':
+            onPlanePause();
+            break;
+    }
+
+}
+
 
 function isLevelFlight(camera, initCameraPosition) {
     return Math.abs(camera.position.x - initCameraPosition.x) < 1.5;

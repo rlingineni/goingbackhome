@@ -13,45 +13,10 @@
       href="https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
       rel="stylesheet"
     />
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-      }
-      #map {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 100%;
-      }
-      #overlay {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 100%;
-      }
-
-      #overlay {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 100%;
-      }
-
-      #airplane {
-        width: 300px;
-        height: 300px;
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-      }
-
-      canvas {
-        display: block;
-        opacity: 1;
-      }
-    </style>
+    <link
+      href="main.css"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div id="map"></div>
@@ -61,6 +26,7 @@
       </div>
     </div>
 
+    <script src="js/hammer.min.js" type="module"></script>
     <script type="module">
       import { initAirplane } from "./airplane.js";
       //LIGHT: mapbox://styles/johnny5coder/ck9kkxb1z1vmr1iojge6490xw
@@ -75,14 +41,7 @@
         interactive: false,
         pitch: 60, // pitch in degrees
         bearing: 0, // bearing in degrees
-        zoom: 10,
       });
-
-      // pixels the map pans when the up or down arrow is clicked
-      var deltaDistance = 200;
-
-      // degrees the map rotates when the left or right arrow is clicked
-      var deltaDegrees = 15;
 
       function easing(t) {
         return t * (2 - t);
@@ -90,7 +49,7 @@
 
       let shouldTurn = false;
       let degreesToTurn = 0;
-      let planeSpeed = 0.01;
+      let planeSpeed = 0.001;
       let isGamePaused = false;
 
       map.on("load", function () {
@@ -138,10 +97,10 @@
         function onSpeedChange(direction) {
           switch (direction) {
             case "up":
-              planeSpeed = Math.max(0.01, planeSpeed + 0.03);
+              planeSpeed = Math.max(0.0005, planeSpeed + 0.001);
               break;
             case "down":
-              planeSpeed = Math.max(0.005, planeSpeed - 0.03);
+              planeSpeed = Math.max(0.0005, planeSpeed - 0.001);
               break;
           }
         }
