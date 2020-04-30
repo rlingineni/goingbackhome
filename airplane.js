@@ -144,6 +144,7 @@ function handleCameraKeyControls(initCameraPosition, camera, evtHandlers) {
                 //down
                 handleFlightMovement("down", initCameraPosition, camera, evtHandlers)
                 break;
+
         }
     };
 }
@@ -202,6 +203,7 @@ function handleFlightMovement(direction, initCameraPosition, camera, evtHandlers
                 camera.position.y += 1;
                 onSpeedChange("down")
             }
+            break;
         case 'pause':
             onPlanePause();
             break;
