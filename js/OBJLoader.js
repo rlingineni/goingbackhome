@@ -15,7 +15,7 @@ import {
 	MeshPhongMaterial,
 	Points,
 	PointsMaterial
-} from "./build/three.module.js";
+} from "../build/three.module.js";
 
 var OBJLoader = ( function () {
 
