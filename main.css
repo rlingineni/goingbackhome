@@ -8,12 +8,6 @@ body {
 	bottom: 0;
 	width: 100%;
   }
-  #overlay {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	width: 100%;
-  }
 
   #overlay {
 	position: absolute;

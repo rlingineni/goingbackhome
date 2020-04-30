@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Display a map with a custom style</title>
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+  </head>
+  <style>
+    body {
+      background: #36d1dc; /* fallback for old browsers */
+      background: -webkit-linear-gradient(
+        to right,
+        #5b86e5,
+        #36d1dc
+      ); /* Chrome 10-25, Safari 5.1-6 */
+      background: linear-gradient(
+        to right,
+        #5b86e5,
+        #36d1dc
+      ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    }
+
+    #center-container {
+      width: 300px;
+      height: 300px;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background-color: burlywood;
+      border-radius: 10px;
+      box-shadow: 5px 8px #888888;
+      text-align: center;
+    }
+
+    #center-container h1,
+    h2,
+    h3 {
+      color: #eee;
+    }
+
+    #lower-left {
+      position: absolute;
+      bottom: 50px;
+      left: 20px;
+    }
+
+    button {
+      background-color: #aa5042;
+      border-radius: 10px;
+      margin: 10px;
+    }
+
+  
+
+  </style>
+  <body>
+    <div id="lower-left"></div>
+    <div id="center-container">
+      <h1>Mr.Navigator</h1>
+      <div style="display: flex; flex-direction: column;">
+        <button onclick="window.location='index.html';" ><h2>Play Game</h2></button>
+        <button><h2>How To</h2></button>
+        <a href="credits.html"><p>credits</p></a>
+      </div>
+    </div>
+  </body>
+</html>
