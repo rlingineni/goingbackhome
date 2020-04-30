@@ -7,10 +7,29 @@ import "./js/hammer.min.js"
 
 
 
+var scene = new THREE.Scene();
+var renderer = new THREE.WebGLRenderer({ alpha: true });
+var animationId, object, KeyboardListeners, HammerManager;
+
+
+export function destroyAirplane() {
+    if (!HammerManager || !KeyboardListeners) {
+        throw ("Cannot Destroy an Airplane that wasn't initialized...")
+    }
+    //unclip the evt handlers.
+    HammerManager.destroy();
+    document.removeEventListener("keydown", KeyboardListeners)
+    scene.remove(object);
+    renderer = null;
+    scene = null;
+    object = null;
+    cancelAnimationFrame(animationId);
+
+}
+
 export function initAirplane(evtHandlers, enableOrbitControls) {
-    var object;
-    var scene = new THREE.Scene();
-    var renderer = new THREE.WebGLRenderer({ alpha: true });
+
+
     // texture
 
     var textureLoader = new THREE.TextureLoader(manager);
@@ -105,7 +124,7 @@ export function initAirplane(evtHandlers, enableOrbitControls) {
     //scene.add(cube);
 
     var animate = function () {
-        requestAnimationFrame(animate);
+        animationId = requestAnimationFrame(animate);
         let bearingMultiplier = Math.abs(initCameraPosition.x - camera.position.x)
         camera.lookAt(scene.position);
 
@@ -122,7 +141,7 @@ export function initAirplane(evtHandlers, enableOrbitControls) {
 function handleCameraKeyControls(initCameraPosition, camera, evtHandlers) {
 
 
-    document.onkeydown = function (e) {
+    KeyboardListeners = function (e) {
         switch (e.keyCode) {
             case 32:
                 //space
@@ -147,12 +166,14 @@ function handleCameraKeyControls(initCameraPosition, camera, evtHandlers) {
 
         }
     };
+
+    document.onkeydown = KeyboardListeners;
 }
 
 
 function handleCameraSwipeControls(element, initCameraPosition, camera, evtHandlers) {
-    let hammertime = new Hammer(element);
-    hammertime.on('pan', function (ev) {
+    HammerManager = new Hammer(element);
+    HammerManager.on('pan', function (ev) {
         switch (ev.additionalEvent) {
             case 'panleft':
                 handleFlightMovement("left", initCameraPosition, camera, evtHandlers)
@@ -169,7 +190,7 @@ function handleCameraSwipeControls(element, initCameraPosition, camera, evtHandl
         }
     });
 
-    hammertime.on('press', function (ev) {
+    HammerManager.on('press', function (ev) {
         handleFlightMovement("pause", initCameraPosition, camera, evtHandlers)
     });
 }
@@ -221,3 +242,4 @@ function calculateDegreesToTurn(camera, initCameraPosition) {
     let bearingMultiplier = initCameraPosition.x - camera.position.x;
     return bearingMultiplier * 1.2;
 }
+

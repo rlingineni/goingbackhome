@@ -50,19 +50,23 @@
     <div id="overlay">
       <div id="hud">
         <div style="display: flex; align-items: center;">
-          <div>
-            <h1 style="font-size: 60px; margin-right: 10px;">
-              ⌂
-            </h1>
-            <!--  <div class="ui mini label" style="margin-bottom: 0px;">Restart</div> -->
-          </div>
+          <h1 style="font-size: 60px; margin-right: 5px;">
+            ⌂
+          </h1>
 
           <div>
-            <h3 style="margin-bottom: 0px;">DFW</h3>
-            <p>(Dallas-Fort Worth)</p>
+            <h3 style="margin-bottom: 0px;">Dallas</h3>
+            <p>(that's where you should go)</p>
           </div>
+          <button
+            style="margin-left: 10px;"
+            onclick="location.reload();"
+            class="circular ui icon button"
+          >
+            ↺
+          </button>
         </div>
-        <p>Get home to <b>Dallas!!</b></p>
+
         <div id="fuel">
           <div style="color: white; margin-right: 10px;">Fuel</div>
 
@@ -87,7 +91,8 @@
 
     <script src="js/hammer.min.js" type="module"></script>
     <script type="module">
-      import { initAirplane } from "./airplane.js";
+      import { initAirplane, destroyAirplane } from "./airplane.js";
+      import { FLIGHT_PATHS } from "./locations.js";
 
       let dimmerEl = document.getElementById("dimmer");
       let progressEl = document.getElementById("loading-bar");
@@ -95,6 +100,7 @@
 
       let guageBounds = guageEl.getBoundingClientRect();
 
+      let activeFlightPath = FLIGHT_PATHS[0];
       //LIGHT: mapbox://styles/johnny5coder/ck9kkxb1z1vmr1iojge6490xw
       //DARK: mapbox://styles/johnny5coder/ck9kkvcao1vh71io7u2hji0kr
       mapboxgl.accessToken =
@@ -102,7 +108,7 @@
       let map = new mapboxgl.Map({
         container: "map", // container id
         style: "mapbox://styles/johnny5coder/ck9kkxb1z1vmr1iojge6490xw", //hosted style id
-        center: [-77.38, 39], // starting position
+        center: activeFlightPath.start, // starting position
         zoom: 10, // starting zoom
         interactive: false,
         pitch: 60, // pitch in degrees
@@ -121,10 +127,12 @@
       let fuelAmount = 1;
 
       let destination = new mapboxgl.Marker()
-        .setLngLat([12.550343, 55.665957])
+        .setLngLat(activeFlightPath.center)
         .setPopup(new mapboxgl.Popup().setHTML("<h3>home</h3>"))
         .addTo(map);
       destination.togglePopup();
+      let { sw, ne } = activeFlightPath.bounds;
+      let destinationBounds = new mapboxgl.LngLatBounds(sw, ne);
 
       map.on("load", function () {
         map.getCanvas().focus();
@@ -132,21 +140,11 @@
         //Do any Map Animations Here. Too slow for the 3js animate loop.
         let gameloop = setInterval(() => {
           if (isGamePaused) {
-            map.easeTo({ pitch: 0, zoom: 4, easing });
-            var nav = new mapboxgl.NavigationControl();
-
-            let marker = new mapboxgl.Marker()
-              .setLngLat(map.getCenter())
-              .setPopup(new mapboxgl.Popup().setHTML("<h3>you</h3>"))
-              .addTo(map);
-            map.addControl(nav, "bottom-left");
-            marker.togglePopup();
-            clearInterval(gameloop);
-
             return;
           }
 
-          if (isGamePaused) {
+          if (isGameOver) {
+            handleGameOver();
             return;
           }
 
@@ -167,7 +165,9 @@
             lng: lng + headingSpeed.long,
           };
 
-          console.log(map.getCenter());
+          if (destinationBounds.contains(map.getCenter())) {
+            isGameOver = true;
+          }
 
           map.easeTo(easeOptions);
           //decrease the 2 minute timer
@@ -187,6 +187,25 @@
             isGameOver = true;
           }
         }, 200);
+
+        function handleGameOver() {
+          map.easeTo({ pitch: 0, zoom: 4, easing });
+          var nav = new mapboxgl.NavigationControl();
+          let marker = new mapboxgl.Marker()
+            .setLngLat(map.getCenter())
+            .setPopup(new mapboxgl.Popup().setHTML("<h3>you</h3>"))
+            .addTo(map);
+          map.addControl(nav, "bottom-left");
+          marker.togglePopup();
+          clearInterval(gameloop);
+          destroyAirplane();
+
+          if (fuelAmount <= 0) {
+            alert("You ran out of fuel!!");
+          } else {
+            alert("Congrats you made it Home!!!");
+          }
+        }
 
         //Evt handler for plane turning
         function onPlaneTurn(isLevel, dToTurn) {
