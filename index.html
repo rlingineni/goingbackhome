@@ -7,257 +7,76 @@
       name="viewport"
       content="initial-scale=1,maximum-scale=1,user-scalable=no"
     />
-    <script src="./js/three.js"></script>
-    <script src="https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
-    <link
-      href="https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
-      rel="stylesheet"
-    />
-    <link href="main.css" rel="stylesheet" />
-    <link href="css/semantic.min.css" rel="stylesheet" />
   </head>
   <style>
-    #hud {
+    body {
+      background: #36d1dc; /* fallback for old browsers */
+      background: -webkit-linear-gradient(
+        to right,
+        #5b86e5,
+        #36d1dc
+      ); /* Chrome 10-25, Safari 5.1-6 */
+      background: linear-gradient(
+        to right,
+        #5b86e5,
+        #36d1dc
+      ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    }
+
+    #center-container {
+      width: 300px;
+      height: 300px;
       position: absolute;
-      height: 15%;
-      width: 100%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    #menu {
+      background-color: burlywood;
+      border-radius: 10px;
+      box-shadow: 5px 8px #888888;
+      text-align: center;
+      margin-top: 10px;
+      padding: 5px;
+    }
+
+    #center-container h1,
+    h2,
+    h3 {
+      color: #eee;
+    }
+
+    #lower-left {
+      position: absolute;
+      bottom: 50px;
+      left: 20px;
+    }
+
+    button {
       background-color: #aa5042;
-      border-bottom: 1px solid burlywood;
-      display: flex;
-      align-items: center;
-      color: white;
-      justify-content: space-between;
-      padding: 2px 10px;
-      opacity: 0.8;
-    }
-
-    #fuel {
-      display: flex;
-      align-items: center;
-    }
-
-    #guage {
-      background-color: gray;
-    }
-
-    #loader {
-      height: 30px;
-      border-radius: 4px;
+      border-radius: 10px;
+      margin: 10px;
     }
   </style>
   <body>
-    <div id="map"></div>
-    <div id="overlay">
-      <div id="hud">
-        <div style="display: flex; align-items: center;">
-          <h1 style="font-size: 60px; margin-right: 5px;">
-            ⌂
-          </h1>
+    <div id="lower-left"></div>
 
-          <div>
-            <h3 style="margin-bottom: 0px;">Dallas</h3>
-            <p>(that's where you should go)</p>
-          </div>
-          <button
-            style="margin-left: 10px;"
-            onclick="location.reload();"
-            class="circular ui icon button"
-          >
-            ↺
+    <div id="center-container">
+      <marquee behavior="scroll" direction="up" scrollamount="2">
+        All of the compasses on Earth have gone haywire. Use your advanced
+        navigation skills and fly us back home.
+      </marquee>
+      <div id="menu">
+        <h1>Going Back Home</h1>
+        <div style="display: flex; flex-direction: column;">
+          <button onclick="window.location='game.html';">
+            <h2>Play Game</h2>
           </button>
-        </div>
-
-        <div id="fuel">
-          <div style="color: white; margin-right: 10px;">Fuel</div>
-
-          <div
-            id="loading-bar"
-            class="ui success progress"
-            style="margin: 0px;"
-          >
-            <div id="gauge" class="bar" style="width: 10em;">
-              <div class="progress"></div>
-            </div>
-          </div>
+          <button><h2>How To</h2></button>
+          <a href="credits.html"><p>credits</p></a>
         </div>
       </div>
-      <div id="dimmer" class="ui active dimmer">
-        <div id="loader" class="ui text loader">
-          Get Home Safely! Starting your flight...
-        </div>
-      </div>
-      <div id="airplane"></div>
     </div>
-
-    <script src="js/hammer.min.js" type="module"></script>
-    <script type="module">
-      import { initAirplane, destroyAirplane } from "./airplane.js";
-      import { FLIGHT_PATHS } from "./locations.js";
-
-      let dimmerEl = document.getElementById("dimmer");
-      let progressEl = document.getElementById("loading-bar");
-      let guageEl = document.getElementById("gauge");
-
-      let guageBounds = guageEl.getBoundingClientRect();
-
-      let activeFlightPath = FLIGHT_PATHS[0];
-      //LIGHT: mapbox://styles/johnny5coder/ck9kkxb1z1vmr1iojge6490xw
-      //DARK: mapbox://styles/johnny5coder/ck9kkvcao1vh71io7u2hji0kr
-      mapboxgl.accessToken =
-        "pk.eyJ1Ijoiam9obm55NWNvZGVyIiwiYSI6ImNrOWs1emJsajFycHgzZXF0ZmZrZ2pubnUifQ.1rLHck77FdpZGEUqR8Qn5g";
-      let map = new mapboxgl.Map({
-        container: "map", // container id
-        style: "mapbox://styles/johnny5coder/ck9kkxb1z1vmr1iojge6490xw", //hosted style id
-        center: activeFlightPath.start, // starting position
-        zoom: 10, // starting zoom
-        interactive: false,
-        pitch: 60, // pitch in degrees
-        bearing: 0, // bearing in degrees
-      });
-
-      function easing(t) {
-        return t * (2 - t);
-      }
-
-      let shouldTurn = false;
-      let degreesToTurn = 0;
-      let planeSpeed = 0.01;
-      let isGamePaused = false;
-      let isGameOver = false;
-      let fuelAmount = 1;
-
-      let destination = new mapboxgl.Marker()
-        .setLngLat(activeFlightPath.center)
-        .setPopup(new mapboxgl.Popup().setHTML("<h3>home</h3>"))
-        .addTo(map);
-      destination.togglePopup();
-      let { sw, ne } = activeFlightPath.bounds;
-      let destinationBounds = new mapboxgl.LngLatBounds(sw, ne);
-
-      map.on("load", function () {
-        map.getCanvas().focus();
-
-        //Do any Map Animations Here. Too slow for the 3js animate loop.
-        let gameloop = setInterval(() => {
-          if (isGamePaused) {
-            return;
-          }
-
-          if (isGameOver) {
-            handleGameOver();
-            return;
-          }
-
-          let { lat, lng } = map.getCenter();
-          let easeOptions = {
-            easing: easing,
-          };
-          if (shouldTurn) {
-            easeOptions.bearing = map.getBearing() + degreesToTurn;
-          }
-          //based on the heading - change the lat long
-          let headingSpeed = determineHeadingSpeed(
-            map.getBearing() + degreesToTurn,
-            planeSpeed
-          );
-          easeOptions.center = {
-            lat: lat + headingSpeed.lat,
-            lng: lng + headingSpeed.long,
-          };
-
-          if (destinationBounds.contains(map.getCenter())) {
-            isGameOver = true;
-          }
-
-          map.easeTo(easeOptions);
-          //decrease the 2 minute timer
-          fuelAmount -= 1 / 600;
-
-          guageEl.style.transform = `scaleX(${fuelAmount})`;
-
-          if (fuelAmount < 0.5 && fuelAmount > 0.2) {
-            progressEl.classList.replace("success", "warning");
-          }
-
-          if (fuelAmount < 0.2) {
-            progressEl.classList.replace("warning", "error");
-          }
-
-          if (fuelAmount <= 0) {
-            isGameOver = true;
-          }
-        }, 200);
-
-        function handleGameOver() {
-          map.easeTo({ pitch: 0, zoom: 4, easing });
-          var nav = new mapboxgl.NavigationControl();
-          let marker = new mapboxgl.Marker()
-            .setLngLat(map.getCenter())
-            .setPopup(new mapboxgl.Popup().setHTML("<h3>you</h3>"))
-            .addTo(map);
-          map.addControl(nav, "bottom-left");
-          marker.togglePopup();
-          clearInterval(gameloop);
-          destroyAirplane();
-
-          if (fuelAmount <= 0) {
-            alert("You ran out of fuel!!");
-          } else {
-            alert("Congrats you made it Home!!!");
-          }
-        }
-
-        //Evt handler for plane turning
-        function onPlaneTurn(isLevel, dToTurn) {
-          if (!isLevel) {
-            shouldTurn = true;
-            degreesToTurn = dToTurn;
-            return;
-          }
-          degreesToTurn = 0;
-          shouldTurn = false;
-        }
-
-        //adjusts the plane speed
-        function onSpeedChange(direction) {
-          switch (direction) {
-            case "up":
-              planeSpeed = Math.max(0.01, planeSpeed + 0.01);
-              break;
-            case "down":
-              planeSpeed = Math.max(0.01, planeSpeed - 0.01);
-              break;
-          }
-        }
-
-        function onPlanePause() {
-          isGamePaused = !isGamePaused;
-          if (isGamePaused) {
-            // dimmerEl.classList.add("active");
-          } else {
-            // dimmerEl.classList.remove("active");
-          }
-        }
-
-        //Calculates the right lat and long rate changes based on angle of flight
-        function determineHeadingSpeed(bearing, rateOfChange) {
-          let long =
-            Math.sin(toRadians(bearing)) * (rateOfChange * Math.sqrt(2));
-          let lat =
-            Math.cos(toRadians(bearing)) * (rateOfChange * Math.sqrt(2));
-          console.log(
-            `Heading ${bearing} - speed in direction X: ${lat}, speed in direction Y:${long}`
-          );
-          return { lat, long };
-        }
-
-        function toRadians(angle) {
-          return angle * (Math.PI / 180);
-        }
-
-        initAirplane({ onPlaneTurn, onSpeedChange, onPlanePause }, false);
-        dimmerEl.classList.remove("active");
-      });
-    </script>
   </body>
 </html>
