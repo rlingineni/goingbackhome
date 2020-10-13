@@ -7,6 +7,7 @@
       name="viewport"
       content="initial-scale=1,maximum-scale=1,user-scalable=no"
     />
+    <script src="https://unpkg.com/mustache@latest"></script>
     <script src="./js/three.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <link
@@ -65,6 +66,14 @@
           >
             ↺
           </button>
+
+          <button
+            style="margin-left: 10px;"
+            onclick="location.reload();"
+            class="circular ui icon button"
+          >
+          ⚙
+          </button>
         </div>
 
         <div id="fuel">
@@ -99,6 +108,9 @@
       let guageEl = document.getElementById("gauge");
 
       let guageBounds = guageEl.getBoundingClientRect();
+
+      //select a random Flight Path from the random list of integers
+
 
       let activeFlightPath = FLIGHT_PATHS[0];
       //LIGHT: mapbox://styles/johnny5coder/ck9kkxb1z1vmr1iojge6490xw
