@@ -127,10 +127,7 @@ export function initAirplane(evtHandlers, enableOrbitControls) {
         animationId = requestAnimationFrame(animate);
         let bearingMultiplier = Math.abs(initCameraPosition.x - camera.position.x)
         camera.lookAt(scene.position);
-
-
-
-
+        
         renderer.render(scene, camera);
     };
 

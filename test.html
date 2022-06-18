@@ -1,164 +1,306 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>three.js webgl - loaders - OBJ loader</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
-	</head>
+  <head>
+    <title>three.js webgl - loaders - OBJ loader</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+    <link type="text/css" rel="stylesheet" href="main.css" />
+  </head>
+
+  <body>
+    <script type="module">
+      import * as THREE from "../build/three.module.js";
+      import TWEEN from "../build/tween.esm.js";
+
+      import { OBJLoader } from "./js/OBJLoader.js";
+
+      var container;
+
+      var camera, scene, renderer, KeyboardListeners;
+
+      var mouseX = 0,
+        mouseY = 0;
+
+      var windowHalfX = window.innerWidth / 2;
+      var windowHalfY = window.innerHeight / 2;
+
+      var object;
+
+      init({
+        onPlaneTurn: () => {
+          console.log("plane turning ... ");
+        },
+        onSpeedChange: () => {
+          console.log("plane speed change..");
+        },
+        onPlanePause: () => {
+          console.log("game paused");
+        },
+      });
+      animate();
+
+      function init(evtHandlers) {
+        container = document.createElement("div");
+        document.body.appendChild(container);
+
+        camera = new THREE.PerspectiveCamera(
+          45,
+          window.innerWidth / window.innerHeight,
+          1,
+          2000
+        );
 
-	<body>
-		<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader test
-		</div>
-
-		<script type="module">
-
-			import * as THREE from '../build/three.module.js';
-
-            import { OBJLoader } from "./js/OBJLoader.js";
-
-			var container;
-
-			var camera, scene, renderer;
-
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
-			var object;
-
-			init();
-			animate();
-
-
-			function init() {
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.z = 250;
-
-				// scene
-
-				scene = new THREE.Scene();
-
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
-				scene.add( ambientLight );
-
-				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
-				camera.add( pointLight );
-				scene.add( camera );
-
-				// manager
-
-				function loadModel() {
-
-					object.traverse( function ( child ) {
-
-						if ( child.isMesh ) child.material.map = texture;
-
-					} );
-
-					object.position.y = - 95;
-					scene.add( object );
-
-				}
-
-				var manager = new THREE.LoadingManager( loadModel );
-
-				manager.onProgress = function ( item, loaded, total ) {
-
-					console.log( item, loaded, total );
-
-				};
-
-				// texture
-
-				var textureLoader = new THREE.TextureLoader( manager );
-
-				var texture = textureLoader.load( 'textures/metal.jpg' );
-
-				// model
-
-				function onProgress( xhr ) {
-
-					if ( xhr.lengthComputable ) {
-
-						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( 'model ' + Math.round( percentComplete, 2 ) + '% downloaded' );
-
-					}
-
-				}
-
-				function onError() {}
-
-				var loader = new OBJLoader( manager );
-
-				loader.load( 'airplane.obj', function ( obj ) {
-
-					object = obj;
-
-				}, onProgress, onError );
-
-				//
-
-				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
-
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
-				//
-
-				window.addEventListener( 'resize', onWindowResize, false );
-
-			}
-
-			function onWindowResize() {
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
-
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX ) / 2;
-				mouseY = ( event.clientY - windowHalfY ) / 2;
-
-			}
-
-			//
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-				render();
-
-			}
-
-			function render() {
-
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
-				camera.lookAt( scene.position );
-
-				renderer.render( scene, camera );
-
-			}
-
-		</script>
-
-	</body>
+        let initCameraPosition = {
+          x: -0.33941374935705737,
+          y: -36.99514020673159,
+          z: 26.671289662114987,
+        };
+
+        camera.position.set(
+          initCameraPosition.x,
+          initCameraPosition.y,
+          initCameraPosition.z
+        );
+
+        handleCameraKeyControls(initCameraPosition, camera, evtHandlers);
+
+        scene = new THREE.Scene();
+
+        var ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
+        scene.add(ambientLight);
+
+        var pointLight = new THREE.PointLight(0xffffff, 0.8);
+        camera.add(pointLight);
+        scene.add(camera);
+
+        // manager
+
+        function loadModel() {
+          object.traverse(function (child) {
+            if (child.isMesh) child.material.map = texture;
+          });
+          scene.add(object);
+        }
+
+        var manager = new THREE.LoadingManager(loadModel);
+
+        manager.onProgress = function (item, loaded, total) {
+          console.log(item, loaded, total);
+        };
+
+        // texture
+
+        var textureLoader = new THREE.TextureLoader(manager);
+
+        var texture = textureLoader.load("textures/metal.jpg");
+
+        // model
+
+        function onProgress(xhr) {
+          if (xhr.lengthComputable) {
+            var percentComplete = (xhr.loaded / xhr.total) * 100;
+            console.log(
+              "model " + Math.round(percentComplete, 2) + "% downloaded"
+            );
+          }
+        }
+
+        function onError() {}
+
+        var loader = new OBJLoader(manager);
+
+        loader.load(
+          "airplane.obj",
+          function (obj) {
+            obj.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI);
+            obj.scale.set(0.1, 0.1, 0.1);
+            object = obj;
+          },
+          onProgress,
+          onError
+        );
+
+        //
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        document.addEventListener("mousemove", onDocumentMouseMove, false);
+
+        //
+
+        window.addEventListener("resize", onWindowResize, false);
+      }
+
+      function onWindowResize() {
+        windowHalfX = window.innerWidth / 2;
+        windowHalfY = window.innerHeight / 2;
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+
+      function onDocumentMouseMove(event) {
+        mouseX = (event.clientX - windowHalfX) / 2;
+        mouseY = (event.clientY - windowHalfY) / 2;
+      }
+
+      function panCamera(start, target) {
+        new TWEEN.Tween(start)
+          .to(target, 300)
+          .onUpdate((newCoords) => {
+            console.log("S");
+            if (newCoords.x) {
+              camera.position.x = newCoords.x;
+            }
+            if (newCoords.y) {
+              camera.position.y = newCoords.y;
+            }
+          })
+          .start();
+      }
+
+      function handleFlightMovement(
+        direction,
+        initCameraPosition,
+        camera,
+        evtHandlers
+      ) {
+        let { onPlaneTurn, onSpeedChange, onPlanePause } = evtHandlers;
+        const turnDelta = 8;
+        const start = { x: camera.position.x, y: camera.position.y };
+        switch (direction) {
+          case "left":
+            // left
+            if (camera.position.x <= initCameraPosition.x + 16) {
+              const turn = camera.position.x + turnDelta;
+              panCamera(start, { x: turn, y: camera.position.y });
+              onPlaneTurn(
+                isLevelFlight(camera, initCameraPosition),
+                calculateDegreesToTurn(camera, initCameraPosition)
+              );
+            }
+            break;
+          case "right":
+            if (camera.position.x >= initCameraPosition.x - 16) {
+              const turn = camera.position.x - turnDelta;
+              panCamera(start, { x: turn, y: camera.position.y });
+              onPlaneTurn(
+                isLevelFlight(camera, initCameraPosition),
+                calculateDegreesToTurn(camera, initCameraPosition)
+              );
+            }
+            break;
+          case "up":
+            if (camera.position.y >= initCameraPosition.y - 10 - 1) {
+              const turn = camera.position.y - 2;
+              panCamera(start, { x: camera.position.x, y: turn });
+
+              onSpeedChange("up");
+            }
+            break;
+          case "down":
+            // down moves closer to user
+            if (camera.position.y <= initCameraPosition.y + 10 + 1) {
+              const turn = camera.position.y + 2;
+              panCamera(start, { x: camera.position.x, y: turn });
+              onSpeedChange("down");
+            }
+            break;
+          case "pause":
+            onPlanePause();
+            break;
+        }
+      }
+
+      function handleCameraKeyControls(
+        initCameraPosition,
+        camera,
+        evtHandlers
+      ) {
+        KeyboardListeners = function (e) {
+          switch (e.keyCode) {
+            case 32:
+              //space
+              handleFlightMovement(
+                "pause",
+                initCameraPosition,
+                camera,
+                evtHandlers
+              );
+              break;
+            case 37:
+              //left
+              handleFlightMovement(
+                "left",
+                initCameraPosition,
+                camera,
+                evtHandlers
+              );
+              break;
+            case 38:
+              // up moves closer to ground
+              handleFlightMovement(
+                "up",
+                initCameraPosition,
+                camera,
+                evtHandlers
+              );
+              break;
+            case 39:
+              // right
+              handleFlightMovement(
+                "right",
+                initCameraPosition,
+                camera,
+                evtHandlers
+              );
+              break;
+            case 40:
+              //down
+              handleFlightMovement(
+                "down",
+                initCameraPosition,
+                camera,
+                evtHandlers
+              );
+              break;
+          }
+        };
+
+        document.onkeydown = KeyboardListeners;
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        TWEEN.update();
+        render();
+      }
+
+      function isLevelFlight(camera, initCameraPosition) {
+        return Math.abs(camera.position.x - initCameraPosition.x) < 1.5;
+      }
+
+      function calculateDegreesToTurn(camera, initCameraPosition) {
+        let bearingMultiplier = initCameraPosition.x - camera.position.x;
+        return bearingMultiplier * 1.2;
+      }
+
+      function render() {
+        // camera.position.x += (mouseX - camera.position.x) * 0.05;
+        // camera.position.y += (-mouseY - camera.position.y) * 0.05;
+
+        camera.lookAt(scene.position);
+
+        renderer.render(scene, camera);
+      }
+    </script>
+  </body>
 </html>
