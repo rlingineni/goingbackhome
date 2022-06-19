@@ -153,9 +153,9 @@
         mouseY = (event.clientY - windowHalfY) / 2;
       }
 
-      function panCamera(start, target) {
+      function panCamera(start, target, duration) {
         new TWEEN.Tween(start)
-          .to(target, 200)
+          .to(target, duration || 200)
           .onUpdate((newCoords) => {
             if (newCoords.x) {
               camera.position.x = newCoords.x;
@@ -174,12 +174,12 @@
         evtHandlers
       ) {
         let { onPlaneTurn, onSpeedChange, onPlanePause } = evtHandlers;
-        const turnDelta = 8;
+        const turnDelta = 6;
         const start = { x: camera.position.x, y: camera.position.y };
         switch (direction) {
           case "left":
             // left
-            if (camera.position.x <= initCameraPosition.x + 16) {
+            if (camera.position.x <= initCameraPosition.x + 12) {
               const turn = camera.position.x + turnDelta;
               panCamera(start, { x: turn, y: camera.position.y });
               onPlaneTurn(
@@ -189,7 +189,7 @@
             }
             break;
           case "right":
-            if (camera.position.x >= initCameraPosition.x - 16) {
+            if (camera.position.x >= initCameraPosition.x - 12) {
               const turn = camera.position.x - turnDelta;
               panCamera(start, { x: turn, y: camera.position.y });
               onPlaneTurn(
@@ -201,7 +201,7 @@
           case "up":
             if (camera.position.y >= initCameraPosition.y - 10 - 1) {
               const turn = camera.position.y - 2;
-              panCamera(start, { x: camera.position.x, y: turn });
+              panCamera(start, { x: camera.position.x, y: turn },100);
 
               onSpeedChange("up");
             }
@@ -210,7 +210,7 @@
             // down moves closer to user
             if (camera.position.y <= initCameraPosition.y + 10 + 1) {
               const turn = camera.position.y + 2;
-              panCamera(start, { x: camera.position.x, y: turn });
+              panCamera(start, { x: camera.position.x, y: turn },100);
               onSpeedChange("down");
             }
             break;

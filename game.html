@@ -9,6 +9,7 @@
     />
     <script src="https://unpkg.com/mustache@latest"></script>
     <script src="./js/three.js"></script>
+    <script src="./js/keydrown.min.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
     <link
       href="https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css"
@@ -50,17 +51,15 @@
     <div id="map"></div>
     <div id="overlay">
       <div id="hud">
-        <div style="display: flex; align-items: center;">
-          <h1 style="font-size: 60px; margin-right: 5px;">
-            ⌂
-          </h1>
+        <div style="display: flex; align-items: center">
+          <h1 style="font-size: 60px; margin-right: 5px">⌂</h1>
 
           <div>
-            <h3 style="margin-bottom: 0px;">Dallas</h3>
+            <h3 style="margin-bottom: 0px">Dallas</h3>
             <p>(that's where you should go)</p>
           </div>
           <button
-            style="margin-left: 10px;"
+            style="margin-left: 10px"
             onclick="location.reload();"
             class="circular ui icon button"
           >
@@ -68,23 +67,19 @@
           </button>
 
           <button
-            style="margin-left: 10px;"
+            style="margin-left: 10px"
             onclick="location.reload();"
             class="circular ui icon button"
           >
-          ⚙
+            ⚙
           </button>
         </div>
 
         <div id="fuel">
-          <div style="color: white; margin-right: 10px;">Fuel</div>
+          <div style="color: white; margin-right: 10px">Fuel</div>
 
-          <div
-            id="loading-bar"
-            class="ui success progress"
-            style="margin: 0px;"
-          >
-            <div id="gauge" class="bar" style="width: 10em;">
+          <div id="loading-bar" class="ui success progress" style="margin: 0px">
+            <div id="gauge" class="bar" style="width: 10em">
               <div class="progress"></div>
             </div>
           </div>
@@ -110,7 +105,6 @@
       let guageBounds = guageEl.getBoundingClientRect();
 
       //select a random Flight Path from the random list of integers
-
 
       let activeFlightPath = FLIGHT_PATHS[0];
       //LIGHT: mapbox://styles/johnny5coder/ck9kkxb1z1vmr1iojge6490xw
