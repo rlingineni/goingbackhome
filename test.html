@@ -8,6 +8,7 @@
       content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
     <link type="text/css" rel="stylesheet" href="main.css" />
+    <script src="./js/keydrown.min.js"></script>
   </head>
 
   <body>
@@ -16,6 +17,7 @@
       import TWEEN from "../build/tween.esm.js";
 
       import { OBJLoader } from "./js/OBJLoader.js";
+      import { MTLLoader } from "./js/MTLLoader.js";
 
       var container;
 
@@ -79,10 +81,10 @@
         // manager
 
         function loadModel() {
-          object.traverse(function (child) {
+         /* object.traverse(function (child) {
             if (child.isMesh) child.material.map = texture;
-          });
-          scene.add(object);
+          });*/
+           scene.add(object);
         }
 
         var manager = new THREE.LoadingManager(loadModel);
@@ -110,18 +112,24 @@
 
         function onError() {}
 
-        var loader = new OBJLoader(manager);
+        var mtlLoader = new MTLLoader();
+        var url = "Boeing_787_8.mtl";
+        mtlLoader.load(url, function (materials) {
+          materials.preload();
 
-        loader.load(
-          "airplane.obj",
-          function (obj) {
-            obj.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI);
-            obj.scale.set(0.1, 0.1, 0.1);
-            object = obj;
-          },
-          onProgress,
-          onError
-        );
+          var loader = new OBJLoader(manager);
+
+          loader.load(
+            "boeing_787_8.obj",
+            function (obj) {
+              obj.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI);
+              obj.scale.set(1.5, 1.5, 1.5);
+              object = obj;
+            },
+            onProgress,
+            onError
+          );
+        });
 
         //
 
@@ -156,7 +164,6 @@
         new TWEEN.Tween(start)
           .to(target, 300)
           .onUpdate((newCoords) => {
-            console.log("S");
             if (newCoords.x) {
               camera.position.x = newCoords.x;
             }
@@ -225,48 +232,35 @@
         camera,
         evtHandlers
       ) {
+        // use keydrown to handle arrow key movements
+
+        kd.LEFT.down(function () {
+          handleFlightMovement("left", initCameraPosition, camera, evtHandlers);
+        });
+
+        kd.RIGHT.down(function () {
+          handleFlightMovement(
+            "right",
+            initCameraPosition,
+            camera,
+            evtHandlers
+          );
+        });
+
+        kd.UP.down(function () {
+          handleFlightMovement("up", initCameraPosition, camera, evtHandlers);
+        });
+
+        kd.DOWN.down(function () {
+          handleFlightMovement("down", initCameraPosition, camera, evtHandlers);
+        });
+
         KeyboardListeners = function (e) {
           switch (e.keyCode) {
             case 32:
               //space
               handleFlightMovement(
                 "pause",
-                initCameraPosition,
-                camera,
-                evtHandlers
-              );
-              break;
-            case 37:
-              //left
-              handleFlightMovement(
-                "left",
-                initCameraPosition,
-                camera,
-                evtHandlers
-              );
-              break;
-            case 38:
-              // up moves closer to ground
-              handleFlightMovement(
-                "up",
-                initCameraPosition,
-                camera,
-                evtHandlers
-              );
-              break;
-            case 39:
-              // right
-              handleFlightMovement(
-                "right",
-                initCameraPosition,
-                camera,
-                evtHandlers
-              );
-              break;
-            case 40:
-              //down
-              handleFlightMovement(
-                "down",
                 initCameraPosition,
                 camera,
                 evtHandlers
@@ -281,6 +275,7 @@
       function animate() {
         requestAnimationFrame(animate);
         TWEEN.update();
+        kd.tick();
         render();
       }
 
