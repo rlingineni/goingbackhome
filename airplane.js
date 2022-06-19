@@ -157,7 +157,7 @@ export function initAirplane(evtHandlers, enableOrbitControls) {
         }
         break;
       case "up":
-        if (camera.position.y >= initCameraPosition.y - 10 - 1) {
+        if (camera.position.y >= initCameraPosition.y - 10) {
           const turn = camera.position.y - 2;
           panCamera(start, { x: camera.position.x, y: turn }, 100);
 
@@ -166,7 +166,7 @@ export function initAirplane(evtHandlers, enableOrbitControls) {
         break;
       case "down":
         // down moves closer to user
-        if (camera.position.y <= initCameraPosition.y + 10 + 1) {
+        if (camera.position.y <= initCameraPosition.y + 12) {
           const turn = camera.position.y + 2;
           panCamera(start, { x: camera.position.x, y: turn }, 100);
           onSpeedChange("down");

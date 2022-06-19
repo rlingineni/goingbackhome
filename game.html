@@ -121,6 +121,7 @@
         bearing: 0, // bearing in degrees
       });
 
+
       function easing(t) {
         return t * (2 - t);
       }
@@ -131,6 +132,7 @@
       let isGamePaused = false;
       let isGameOver = false;
       let fuelAmount = 1;
+      let mapZoom = 10;
 
       let destination = new mapboxgl.Marker()
         .setLngLat(activeFlightPath.center)
@@ -155,17 +157,21 @@
           }
 
           let { lat, lng } = map.getCenter();
+
           let easeOptions = {
             easing: easing,
           };
+
           if (shouldTurn) {
             easeOptions.bearing = map.getBearing() + degreesToTurn;
           }
+
           //based on the heading - change the lat long
           let headingSpeed = determineHeadingSpeed(
             map.getBearing() + degreesToTurn,
             planeSpeed
           );
+
           easeOptions.center = {
             lat: lat + headingSpeed.lat,
             lng: lng + headingSpeed.long,
