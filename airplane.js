@@ -130,45 +130,58 @@ export function initAirplane(evtHandlers, enableOrbitControls) {
     evtHandlers
   ) {
     let { onPlaneTurn, onSpeedChange, onPlanePause } = evtHandlers;
-    const turnDelta = 8;
+    const turnDelta = 0.25;
+    const climbDelta = 0.25;
     const start = { x: camera.position.x, y: camera.position.y };
     switch (direction) {
       case "left":
         // left
         if (camera.position.x <= initCameraPosition.x + 16) {
           const turn = camera.position.x + turnDelta;
-          panCamera(start, { x: turn, y: camera.position.y }, 200, () => {
-            onPlaneTurn(
-              isLevelFlight(camera, initCameraPosition),
-              calculateDegreesToTurn(camera, initCameraPosition)
-            );
-          });
+          panCamera(
+            start,
+            camera,
+            { x: turn, y: camera.position.y },
+            200,
+            () => {
+              onPlaneTurn(
+                isLevelFlight(camera, initCameraPosition),
+                calculateDegreesToTurn(camera, initCameraPosition)
+              );
+            }
+          );
         }
         break;
       case "right":
         if (camera.position.x >= initCameraPosition.x - 16) {
           const turn = camera.position.x - turnDelta;
-          panCamera(start, { x: turn, y: camera.position.y }, 200, () => {
-            onPlaneTurn(
-              isLevelFlight(camera, initCameraPosition),
-              calculateDegreesToTurn(camera, initCameraPosition)
-            );
-          });
+          panCamera(
+            start,
+            camera,
+            { x: turn, y: camera.position.y },
+            200,
+            () => {
+              onPlaneTurn(
+                isLevelFlight(camera, initCameraPosition),
+                calculateDegreesToTurn(camera, initCameraPosition)
+              );
+            }
+          );
         }
         break;
       case "up":
-        if (camera.position.y >= initCameraPosition.y - 10) {
-          const turn = camera.position.y - 2;
-          panCamera(start, { x: camera.position.x, y: turn }, 100);
+        if (camera.position.y >= initCameraPosition.y - 8) {
+          const turn = camera.position.y - climbDelta;
+          panCamera(start, camera, { x: camera.position.x, y: turn }, 100);
 
           onSpeedChange("up");
         }
         break;
       case "down":
         // down moves closer to user
-        if (camera.position.y <= initCameraPosition.y + 12) {
-          const turn = camera.position.y + 2;
-          panCamera(start, { x: camera.position.x, y: turn }, 100);
+        if (camera.position.y <= initCameraPosition.y + 5) {
+          const turn = camera.position.y + climbDelta;
+          panCamera(start, camera, { x: camera.position.x, y: turn }, 100);
           onSpeedChange("down");
         }
         break;
@@ -178,21 +191,15 @@ export function initAirplane(evtHandlers, enableOrbitControls) {
     }
   }
 
-  function panCamera(start, target, duration, onComplete) {
-    const tween = new TWEEN.Tween(start)
-      .to(target, duration || 200)
-      .onUpdate((newCoords) => {
-        if (newCoords.x) {
-          camera.position.x = newCoords.x;
-        }
-        if (newCoords.y) {
-          camera.position.y = newCoords.y;
-        }
-      })
-      .start();
-
+  function panCamera(start, camera, target, duration, onComplete) {
+    if (target.x) {
+      camera.position.x = target.x;
+    }
+    if (target.y) {
+      camera.position.y = target.y;
+    }
     if (onComplete) {
-      tween.onComplete(onComplete);
+      onComplete();
     }
   }
 
