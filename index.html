@@ -9,27 +9,44 @@
     />
   </head>
   <style>
+   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,500;1,600&family=Roboto:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,500;1,700;1,900&display=swap');
+
     body {
-      background: #36d1dc; /* fallback for old browsers */
-      background: -webkit-linear-gradient(
-        to right,
-        #5b86e5,
-        #36d1dc
-      ); /* Chrome 10-25, Safari 5.1-6 */
+      background: #6db8c6; /* fallback for old browsers */
       background: linear-gradient(
-        to right,
-        #5b86e5,
-        #36d1dc
+        90deg,
+        #7f8081 0%,
+        #6db8c6 89.58%
       ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+      height: 100vh;
+      font-family: "Roboto";
+
+
+    }
+
+    .flex {
+      display: flex;
+    }
+
+    #terminal-block {
+      background: #000000;
+      color: #05ff00;
+      font-family: "IBM Plex Mono", monospace;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 32px;
+      border-radius: 10px;
+      padding: 5px 15px;
+      width: 500px;
     }
 
     #center-container {
-      width: 300px;
-      height: 300px;
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     #menu {
@@ -38,7 +55,7 @@
       box-shadow: 5px 8px #888888;
       text-align: center;
       margin-top: 10px;
-      padding: 5px;
+      padding: 10px5px;
     }
 
     #center-container h1,
@@ -53,26 +70,103 @@
       left: 20px;
     }
 
-    button {
+    .button {
       background-color: #aa5042;
-      border-radius: 10px;
-      margin: 10px;
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
+      margin: 10px 0px;
+      padding: 10px 15px;
+      cursor: pointer;
     }
-  </style>
-  <body>
-    <div id="lower-left"></div>
 
+    .button:hover{
+      background-color: #9A4B3C;
+    }
+
+    @keyframes cursor-blink {
+      0% {opacity: 0;}
+      100% {opacity: 100;}
+    }
+
+    @keyframes light-rotate {
+      0% {transform: rotate(20deg)}
+      100% {transform: rotate(-20deg)}
+    }
+
+    .light-rotate{
+      animation-name: light-rotate;
+      animation-duration: 1.2s;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
+      transform-origin: center;
+      animation-timing-function: ease-in-out;
+
+    }
+
+    .cursor-blink{
+      animation-name: cursor-blink;
+      animation-duration: .75s;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
+    }
+
+  </style>
+
+  <body>
     <div id="center-container">
-      <div id="menu">
-        <h1>Going Back Home</h1>
-        <div style="display: flex; flex-direction: column;">
-          <button onclick="window.location='game.html';">
-            <h2>Play Game</h2>
-          </button>
-          <button><h2>How To</h2></button>
-          <button><h2>High Scores</h2></button>
-          <a href="credits.html"><p>credits</p></a>
+      
+      <div class="flex" style="gap: 12px">
+        <div>
+        <svg
+          width="75"
+          height="73"
+          viewBox="0 0 75 73"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <ellipse cx="37.5" cy="36.5" rx="37.5" ry="36.5" fill="#212121" />
+          <g class="light-rotate">
+          <path
+            d="M35.8654 7.08671C36.786 6.22798 38.214 6.22798 39.1346 7.08671L56.2499 23.0526C57.8405 24.5364 56.7905 27.2012 54.6153 27.2012H20.3847C18.2095 27.2012 17.1595 24.5364 18.7501 23.0526L35.8654 7.08671Z"
+            fill="#9F5547"
+          />
+          <rect
+            x="16.5898"
+            y="29.2"
+            width="42.1659"
+            height="32.3286"
+            rx="4.79263"
+            fill="#D8B98D"
+          />
+            </g>
+        </svg>
         </div>
+        <div style="position: relative;">  
+        <h2 style="position: absolute; top:-60px; font-style: italic;">Fly Me Home</h2>
+        <div id="terminal-block">
+          <p>Pilots,</p>
+          <p>
+            A solar storm has knocked out radios across the world. We’ve lost
+            all positioning data.
+          </p>
+          <span><p>
+            We’re counting on you to get these passengers to their destination.
+            <span class="cursor-blink" style="height:12px;width:12px; background:#05ff00;">&nbsp;</span>
+          </p>   
+        </div>
+        <div style="width:100%; justify-content: space-between; align-items: baseline;" class="flex">
+          <div class="flex" style="gap: 12px">
+            <u><p>How-To</p></u>
+            <u><p>Credits</p></u>
+          </div>
+          <a href="/game" style="text-decoration:none">
+            <div class="button">
+             Fly
+            </div>
+          </a>
+        </div>
+        <div>
       </div>
     </div>
   </body>

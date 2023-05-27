@@ -19,26 +19,41 @@
     <link href="css/semantic.min.css" rel="stylesheet" />
   </head>
   <style>
-    #hud {
+    #overlay {
       position: absolute;
-      height: 15%;
+    }
+
+    #hud {
+      height: 8.2em;
       width: 100%;
-      background-color: #aa5042;
+      background-color: rgba(122, 147, 151, 0.6);
       border-bottom: 1px solid burlywood;
       display: flex;
       align-items: center;
-      color: white;
       justify-content: space-between;
+      color: white;
       padding: 2px 10px;
-      opacity: 0.8;
+      gap: 15px;
     }
 
-    #fuel {
-      display: flex;
-      align-items: center;
+    #small-terminal {
+      background: #000000;
+      color: #05ff00;
+      font-family: "IBM Plex Mono", monospace;
+      font-style: normal;
+      font-weight: 200;
+      font-size: 1em;
+      line-height: 0.5em;
+      border-radius: 10px;
+      padding: 8px 12px;
+      max-width: 600px;
     }
 
-    #guage {
+    #small-terminal p {
+      line-height: 1em;
+    }
+
+    #gauge {
       background-color: gray;
     }
 
@@ -46,42 +61,150 @@
       height: 30px;
       border-radius: 4px;
     }
+
+    .circle-button {
+      border-radius: 50%;
+      width: 4.5em;
+      height: 4.5em;
+      background: #d9d9d9;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .circle-button:hover {
+      background: gray;
+    }
   </style>
   <body>
     <div id="map"></div>
     <div id="overlay">
+      <div class="ui modal">
+        <i class="close icon"></i>
+        <div class="header">Modal Title</div>
+        <div class="image content">
+          <div class="image">An image can appear on left or an icon</div>
+          <div class="description">A description can appear on the right</div>
+        </div>
+        <div class="actions">
+          <div class="ui button">Cancel</div>
+          <div class="ui button">OK</div>
+        </div>
+      </div>
       <div id="hud">
         <div style="display: flex; align-items: center">
-          <h1 style="font-size: 60px; margin-right: 5px">⌂</h1>
-
-          <div>
-            <h3 style="margin-bottom: 0px">Dallas</h3>
-            <p>(that's where you should go)</p>
+          <svg
+            style="margin-right: 16px; transform: scale(0.8)"
+            width="75"
+            height="73"
+            viewBox="0 0 75 73"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <ellipse cx="37.5" cy="36.5" rx="37.5" ry="36.5" fill="#212121" />
+            <g class="light-rotate">
+              <path
+                d="M35.8654 7.08671C36.786 6.22798 38.214 6.22798 39.1346 7.08671L56.2499 23.0526C57.8405 24.5364 56.7905 27.2012 54.6153 27.2012H20.3847C18.2095 27.2012 17.1595 24.5364 18.7501 23.0526L35.8654 7.08671Z"
+                fill="#9F5547"
+              />
+              <rect
+                x="16.5898"
+                y="29.2"
+                width="42.1659"
+                height="32.3286"
+                rx="4.79263"
+                fill="#D8B98D"
+              />
+            </g>
+          </svg>
+          <div id="small-terminal">
+            <p>Destination:</p>
+            <p>Dallas-Fort Worth (DFW)</p>
           </div>
-          <button
-            style="margin-left: 10px"
-            onclick="location.reload();"
-            class="circular ui icon button"
-          >
-            ↺
-          </button>
-
-          <button
-            style="margin-left: 10px"
-            onclick="location.reload();"
-            class="circular ui icon button"
-          >
-            ⚙
-          </button>
-        </div>
-
-        <div id="fuel">
-          <div style="color: white; margin-right: 10px">Fuel</div>
-
-          <div id="loading-bar" class="ui success progress" style="margin: 0px">
-            <div id="gauge" class="bar" style="width: 10em">
-              <div class="progress"></div>
+          <div style="margin-left: 12px">
+            <div>
+              <div
+                style="color: #515050; margin-right: 10px; font-weight: bold"
+              >
+                Fuel
+              </div>
+              <div
+                id="loading-bar"
+                class="ui success progress"
+                style="margin: 0px; min-width: 0px"
+              >
+                <div id="gauge" class="bar" style="min-width: 0px">
+                  <div class="progress"></div>
+                </div>
+              </div>
             </div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 12px">
+          <div class="circle-button" id="pause-button">
+            <svg
+              id="pause-icon"
+              width="16"
+              height="25"
+              viewBox="0 0 16 25"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect width="6" height="25" rx="2" fill="#494949" />
+              <rect x="10" width="6" height="25" rx="2" fill="#494949" />
+            </svg>
+            <svg
+              id="play-icon"
+              style="display: none"
+              width="20"
+              height="23"
+              viewBox="0 0 20 23"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M17.9556 8.79561C19.8965 9.96101 19.8965 12.7742 17.9556 13.9396L4.7889 21.8454C2.78934 23.046 0.244572 21.6058 0.244572 19.2734L0.244572 3.46173C0.244572 1.12941 2.78934 -0.310858 4.7889 0.889764L17.9556 8.79561Z"
+                fill="#494949"
+              />
+            </svg>
+          </div>
+          <div class="circle-button">
+            <svg
+              width="43"
+              height="41"
+              viewBox="0 0 43 41"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M22.6153 39.1474C51.2889 26.3227 29.3223 -3.79447 14.4783 12.3591"
+                stroke="#494949"
+                stroke-width="4"
+              />
+              <path
+                d="M9.10335 6.85674C9.86637 4.7253 12.6251 4.17474 14.1478 5.85003L19.6691 11.9245C21.2378 13.6505 20.3234 16.4279 18.0362 16.8844L9.74828 18.5383C7.46106 18.9948 5.55061 16.7811 6.33668 14.5853L9.10335 6.85674Z"
+                fill="#494949"
+              />
+            </svg>
+          </div>
+          <div class="circle-button">
+            <svg
+              width="36"
+              height="34"
+              viewBox="0 0 36 34"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect y="5" width="16" height="7" rx="2" fill="#494949" />
+              <rect y="16" width="16" height="7" rx="2" fill="#494949" />
+              <rect y="27" width="16" height="7" rx="2" fill="#494949" />
+              <path
+                d="M22.428 4.28346C23.5934 2.34256 26.4066 2.34256 27.572 4.28345L31.7977 11.3211C32.9983 13.3206 31.558 15.8654 29.2257 15.8654L20.7743 15.8654C18.442 15.8654 17.0017 13.3206 18.2023 11.3211L22.428 4.28346Z"
+                fill="#494949"
+              />
+              <rect x="22" y="12" width="6" height="22" rx="2" fill="#494949" />
+            </svg>
           </div>
         </div>
       </div>
@@ -94,15 +217,16 @@
     </div>
 
     <script src="js/hammer.min.js" type="module"></script>
+
     <script type="module">
       import { initAirplane, destroyAirplane } from "./airplane.js";
       import { FLIGHT_PATHS } from "./locations.js";
 
       let dimmerEl = document.getElementById("dimmer");
       let progressEl = document.getElementById("loading-bar");
-      let guageEl = document.getElementById("gauge");
+      let gaugeEl = document.getElementById("gauge");
 
-      let guageBounds = guageEl.getBoundingClientRect();
+      let guageBounds = gaugeEl.getBoundingClientRect();
 
       //select a random Flight Path from the random list of integers
 
@@ -120,7 +244,6 @@
         pitch: 60, // pitch in degrees
         bearing: 0, // bearing in degrees
       });
-
 
       function easing(t) {
         return t * (2 - t);
@@ -141,6 +264,24 @@
       destination.togglePopup();
       let { sw, ne } = activeFlightPath.bounds;
       let destinationBounds = new mapboxgl.LngLatBounds(sw, ne);
+
+      const pauseButton = document.getElementById("pause-button");
+      pauseButton.addEventListener("click", onPlanePause, false);
+
+      function onPlanePause() {
+        const playIcon = document.getElementById("play-icon");
+        const pauseIcon = document.getElementById("pause-icon");
+        playIcon.style.display = "block";
+
+        isGamePaused = !isGamePaused;
+        if (isGamePaused) {
+          playIcon.style.display = "block";
+          pauseIcon.style.display = "none";
+        } else {
+          playIcon.style.display = "none";
+          pauseIcon.style.display = "block";
+        }
+      }
 
       map.on("load", function () {
         map.getCanvas().focus();
@@ -182,10 +323,11 @@
           }
 
           map.easeTo(easeOptions);
-          //decrease the 2 minute timer
+          //decrease the 2 minute timer, divide by 600 because it runs every 200ms
           fuelAmount -= 1 / 600;
 
-          guageEl.style.transform = `scaleX(${fuelAmount})`;
+          gaugeEl.transformOrigin = "left center;";
+          gaugeEl.style.width = `${300 * fuelAmount}px`;
 
           if (fuelAmount < 0.5 && fuelAmount > 0.2) {
             progressEl.classList.replace("success", "warning");
@@ -239,15 +381,6 @@
             case "down":
               planeSpeed = Math.max(0.01, planeSpeed - 0.01);
               break;
-          }
-        }
-
-        function onPlanePause() {
-          isGamePaused = !isGamePaused;
-          if (isGamePaused) {
-            // dimmerEl.classList.add("active");
-          } else {
-            // dimmerEl.classList.remove("active");
           }
         }
 
