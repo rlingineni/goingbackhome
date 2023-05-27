@@ -1,4 +1,4 @@
-import TWEEN from "../build/tween.esm.js";
+import TWEEN from "./build/tween.esm.js";
 
 import { OBJLoader } from "./js/OBJLoader.js";
 import { OrbitControls } from "./js/OrbitControls.js";
